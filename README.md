@@ -23,6 +23,8 @@ python3 -m pip install -r ~/.codex/skills/vt-design-walkthrough/requirements.txt
 
 ## 使用
 
+推荐仅显式调用：在对话中输入 `$vt-design-walkthrough` 启动。本技能已设置 `allow_implicit_invocation: false`，不会根据话题自动启用。
+
 ```text
 使用 $vt-design-walkthrough，设置 goal，走查这个 Figma 文件对应的 iOS 测试版本：
 设计链接：…

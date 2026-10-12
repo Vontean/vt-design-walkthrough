@@ -2,3 +2,6 @@ interface:
   display_name: "设计走查"
   short_description: "解读 Figma 并走查开发版本，标注问题证据、集中复核后写入公司 Confluence 表格"
   default_prompt: "使用 $vt-design-walkthrough，设置 goal 并根据我提供的 Figma 链接完成指定开发版本的走查，生成供我集中复核的问题表。"
+
+policy:
+  allow_implicit_invocation: false
