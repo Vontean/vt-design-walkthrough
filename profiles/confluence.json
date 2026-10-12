@@ -1,0 +1,51 @@
+{
+  "name": "confluence",
+  "issue_status": "UX RE",
+  "status_colour": "yellow",
+  "issue_types": [
+    "UI Revert",
+    "UX Revert",
+    "CW REVERT",
+    "BUG",
+    "UI Optimization",
+    "UX Optimization"
+  ],
+  "columns": [
+    "Acceptance Status",
+    "Issue Status",
+    "Issue Typ",
+    "System",
+    "Feature Module",
+    "Page Screenshot",
+    "Issues and Discussions",
+    "R&D Owner",
+    "Issue Resolution Status"
+  ],
+  "separator_rows": true,
+  "save_mode": "draft",
+  "type_colours": {
+    "UI Revert": "green",
+    "UX Revert": "green",
+    "CW REVERT": "green",
+    "BUG": "neutral",
+    "UI Optimization": "blue",
+    "UX Optimization": "blue"
+  },
+  "column_roles": [
+    "acceptance",
+    "issue_status",
+    "issue_type",
+    "platform",
+    "module",
+    "problem",
+    "discussion",
+    "owner",
+    "resolution"
+  ],
+  "type_guidance": {
+    "implementation": "按视觉、交互、文案分别选择对应 Revert；非设计类缺陷选择 BUG",
+    "design_change": "按视觉或交互选择 Optimization",
+    "needs_confirmation": "按当前模板合适标签填写，正文保留待确认性质",
+    "coverage_request": "依据目标表格选择合适标签，正文明确是覆盖请求，非已确认缺陷"
+  }
+}

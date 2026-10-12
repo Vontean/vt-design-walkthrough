@@ -1,0 +1,60 @@
+---
+name: vt-design-walkthrough
+description: 根据 Figma 交互稿走查 iOS 或 Android 开发版本，分批记录并标注设计问题，完成整轮走查后集中复核，按授权写入 Confluence 走查表。适用于设计验收和交互还原检查。
+---
+
+# 设计走查
+
+输出可核对的用例覆盖记录和问题表。范围由本次设计文件、开发版本和平台决定；在线格式在选择配置后才应用。
+
+## 1. 建立任务与设备入口
+
+读取 [数据契约与脚本顺序](references/data-contract.md)，确定设计链接、平台、开发版本入口和项目输出目录。新任务使用独立目录；已有任务核对 run.json 的目标与平台后恢复。使用 prepare-run.py 初始化，调用脚本时传入当前技能绝对路径。
+
+iOS 开始设备操作前读取 [iPhone Mirroring](references/ios-mirroring.md)；Android 读取 [实机镜像](references/android-mirroring.md)。识别当前可用的 Figma、Computer 和文件工具，按工具返回的文档使用。工具入口缺失时采用允许的等效工具，无法继续才请求用户解除具体阻塞。
+
+执行整轮走查且用户明确要求设置 goal 时，用可用 goal 工具定义本次范围及交付目标；仅在用户提供预算时填写 token_budget。无 goal 工具时用本地进度恢复。将“本地复核稿”与“确认后在线交付”写成不同阶段，等待审阅期间保留下一步。
+
+**完成条件：** run.json 已保存范围与真实环境，设计及设备入口可用；在线链接可等到在线交付前补充。
+
+## 2. 建立总览，解读当前 Page
+
+读取 [Figma 与验收用例](references/figma-and-cases.md)。先保存有序 Page 清单及 module_order；向用户展示简明范围、用例组织和完成标准，然后继续，无需等待批准。
+
+选取第一个未完成 Page，设 current_page、phase=decode、Page.status=active。解读该 Page 的交互、状态、规则与视觉表现，把要求写入 Page.requirements，再生成 cases.json 中的可执行用例；每条要求关联其用例或明确排除理由。多平台各建用例。
+
+**完成条件：** 当前 Page 每条要求能追到用例或排除理由；用例具备前置条件、操作步骤、可观察预期和 Figma 依据。达到后进入第 3 步。
+
+## 3. 执行当前 Page，分批保存
+
+设 phase=walkthrough。按用例顺序执行；进入用例记录 active_case，操作后保存 current_step、last_observation 和 next_action。跨 Page 跳转回到该用例预期的状态再接续。
+
+初始每批 3–5 个用例或约 15–25 次有效 UI 操作，以先达到者为准。按复杂度调整批量，保存边界不等于完成边界。每个用例最终归入 pass / issue / blocked / not_applicable；blocked 表示前置条件不可达，not_applicable 表示该平台或范围不适用，两者必须写原因。
+
+缺数据先尝试授权范围内已有账号、筛选条件、记录或样本；仍不可达记录缺少条件、已尝试路径和补测方法。当前条件无法覆盖时继续其他独立用例。
+
+发现疑似问题，立即按 [取证与复核](references/evidence-and-review.md) 核对、拆分、保存原图、生成标注、关联记录并核验。每批运行本地校验（不带 --final），修正错误后更新 batch 和 next_action，并追加 LOG.md。
+
+**完成条件：** 本批用例有结果，原图、问题及恢复点已保存。当前 Page 尚有 pending 用例则继续第 3 步；全部处理后设 Page.status=done，清空 active_case。还有未完成 Page 则回到第 2 步；全部 Page 完成才进入第 4 步。
+
+执行期间自主完成全范围。仅在无法自行解除的阻塞（设备锁定、连接不可用、必要凭据缺失）或无法推断的必要范围决定时请求介入。阶段更新不要求中途审阅。
+
+## 4. 交付完整本地稿，集中复核
+
+运行 validate-delivery.py --final；依据错误报告补齐覆盖和证据，校验通过后运行 build-confluence-table.py 生成 RECORD.md。交付用例状态计数、按性质区分的问题计数、未覆盖条件和本地文件链接；邀请用户集中评价及补充截图。
+
+用户截图按取证流程核对后关联原用例；不在原用例中的行为先新增用例。审阅结果同步回 JSON，稳定 ID 不变；修改意见重新核对受影响内容，再生成文档。平台不同各建问题记录，需要时用 related_ids 关联。
+
+**完成条件：** 全部范围已处理，本地稿已交付。只要求本地稿时设 phase=complete，按目标关闭 goal；需要用户复核或在线交付时设 phase=review、next_action=等待集中审阅，不能把整轮在线交付标为完成。得到反馈后，仅确认需要反馈的项 publish=true。
+
+## 5. 授权后在线交付
+
+用户已授权写入才读取 [Confluence 写入](references/confluence-writeback.md)。读取 [个人偏好](profiles/user-profile.json) 与 [Confluence 模板](profiles/confluence.json)。个人配置管理署名和图片尺寸，模板配置管理标签、列角色与保存模式；按用户要求及实际页面调整。先核对表头和列角色，再选适用适配器。
+
+新模板先写一条并取得格式确认；已确认且结构未变化的模板直接批量写入。每批保存附件/条目映射、回读核对。脚本只生成新增行片段，目标内容的最小范围编辑由连接器完成。
+
+**完成条件：** 授权条目及附件已回读核验，--final --writeback 校验通过，实际页面显示可读，其他内容及非管理字段保持一致；保存交付链接与报告，设 phase=complete。默认草稿或按明确授权发布。goal 只在所定义目标达成后 complete，暂停与阻塞遵循当前工具契约。
+
+## 恢复与文件路由
+
+恢复先读 run.json、active_case 和其当前 Page；重新观察设备后从 next_action 继续。其余 Page、历史问题和日志按需读取。JSON 为事实来源，RECORD.md 是生成视图。无需一次加载全部 references；平台文件仅读取当前平台，Confluence 和 profile 仅在在线交付分支读取。
