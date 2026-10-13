@@ -15,7 +15,7 @@
 2. 收集附件映射后执行 build-confluence-table.py --help；传入运行目录、--confluence 模板路径、--user-profile 个人配置路径、当地日期和附件映射。生成的 HTML 原生节点仅用于支持这种格式的连接器；其他格式按当时的官方工具契约适配。
 3. 原生状态来自 confluence.issue_status；issue_type 依据 confluence.type_guidance，从允许的 issue_types 中选择；平台填写真实平台，模块顺序来自 run.module_order。coverage_request 正文明确是覆盖请求而非已确认缺陷。
 4. column_roles 的 problem 列含标题、触发条件/实际表现和红框图；discussion 列含 user-profile.author、原生日期、反馈、用户审阅说明、Figma 精确链接及蓝框图。kind=needs_confirmation/design_change/coverage_request 明确标注性质。
-5. 原生日期来自运行当地日期，不固定历史日期。媒体引用真实附件 ID；预览尺寸来自 user-profile，保留原附件放大。模块切换插入一个空行，不在同一模块重复插空。
+5. 原生日期来自运行当地日期，不固定历史日期。媒体引用真实附件 ID；主图使用 manifest 中的完整 problem_image/design_image，预览尺寸来自 user-profile，保留完整附件供放大查看。局部放大图可用于本地复核，不能替换表格主图。模块切换插入一个空行，不在同一模块重复插空。
 
 完成：所有拟写入行和真实附件对应，表格片段准备好；无临时凭据写入日志。
 

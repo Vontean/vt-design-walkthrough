@@ -22,9 +22,9 @@ kind：implementation（有依据的实现偏差）、needs_confirmation（缺�
 
 ## annotations.json
 
-对象含 items 数组。每项 id、problem、design；后两者含 source、crop（可省略，默认全图）、boxes（可省略）。crop 和 boxes 为原图坐标归一化的 [x,y,width,height]，所有矩形在原图范围内。crop 必须包含全部标注框。可选 extra_problems 数组，元素与 problem 相同，适合同一问题的多个必要证据。
+对象含 items 数组。每项 id、problem、design；后两者含 source、crop（可省略）、boxes（可省略）。主图始终保留完整 source 范围；crop 只指定补充放大图，必须包含全部标注框。crop 和 boxes 为原图坐标归一化的 [x,y,width,height]，所有矩形在原图范围内。可选 extra_problems 数组，元素与 problem 相同，适合同一问题的多个必要证据；其原图以完整范围拼入主图。
 
-render-evidence.py --help 查看参数。渲染成功后读取 evidence/render-manifest.json，按 id 把 problem_image/design_image 写回 findings.json，并从 annotations.json 写回原图 source 字段；脚本不自动改问题事实。产物 evidence/<id>-problem.png、<id>-design.png、<id>-comparison.png；原图保持原样。标注配置是坐标依据，模型仍需打开生成图核验位置。
+render-evidence.py --help 查看参数。渲染成功后读取 evidence/render-manifest.json，按 id 把 problem_image/design_image 写回 findings.json，并从 annotations.json 写回原图 source 字段；脚本不自动改问题事实。主产物 evidence/<id>-problem.png、<id>-design.png、<id>-comparison.png；manifest 的 context_mode 为 full。非全图 crop 另生成 <id>-problem-detail.png / <id>-design-detail.png，映射到 problem_detail_image / design_detail_image，只作补充，不能替代主图字段。原图保持原样。标注配置是坐标依据，模型仍需打开生成图核验位置。
 
 ## 写入恢复与结果
 

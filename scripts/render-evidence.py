@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Crop and frame real screenshots using normalized original-image coordinates. Requires Pillow."""
+"""Frame full screenshots; optional crops produce supplemental detail images. Requires Pillow."""
 import argparse, json, re
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -44,15 +44,23 @@ def main():
         ident=item['id']
         if not re.fullmatch(r'[A-Za-z0-9_-]+',ident) or ident in seen: raise ValueError('无效或重复 ID')
         seen.add(ident)
-        parts=[panel(s,a.run,a.width,'#ff1717') for s in item.get('extra_problems',[])+[item['problem']]]
+        # 主证据保留完整原图，旧 crop 配置仅用于补充放大图。
+        full=lambda s: {**s,'crop':[0,0,1,1]}
+        parts=[panel(full(s),a.run,a.width,'#ff1717') for s in item.get('extra_problems',[])+[item['problem']]]
         actual=Image.new('RGB',(a.width,sum(i.height for i in parts)+20*(len(parts)-1)),'white'); y=0
         for part in parts: actual.paste(part,(0,y));y+=part.height+20
-        design=panel(item['design'],a.run,a.width,'#2489e7')
+        design=panel(full(item['design']),a.run,a.width,'#2489e7')
         comparison=Image.new('RGB',(a.width*2+20,max(actual.height,design.height)),'white')
         comparison.paste(actual,(0,0));comparison.paste(design,(a.width+20,0))
-        entry={'id':ident}
+        entry={'id':ident,'context_mode':'full'}
         for key,im in [('problem',actual),('design',design),('comparison',comparison)]:
             file=out/f'{ident}-{key}.png'; im.save(file);entry[key+'_image']=str(file.relative_to(a.run));entry[key+'_size']=list(im.size)
+        for key,colour in [('problem','#ff1717'),('design','#2489e7')]:
+            spec=item[key]
+            if spec.get('crop',[0,0,1,1])!=[0,0,1,1]:
+                detail=panel(spec,a.run,a.width,colour)
+                file=out/f'{ident}-{key}-detail.png';detail.save(file)
+                entry[key+'_detail_image']=str(file.relative_to(a.run))
         results.append(entry)
     (out/'render-manifest.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({'rendered':len(results),'manifest':str(out/'render-manifest.json')},ensure_ascii=False))

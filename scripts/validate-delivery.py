@@ -35,6 +35,8 @@ def main():
         if a.final:
             check(c.get('status')!='pending',label+'：仍待执行')
             if c.get('status')=='pass':check(bool(c.get('actual')),label+'：通过项缺实际观察')
+    manifest_path=a.run/'evidence/render-manifest.json'
+    rendered=ids(json.loads(manifest_path.read_text(encoding='utf-8')),'render') if manifest_path.exists() else {}
     for i in findings:
         label=i['id'];check(i.get('kind') in KINDS,label+'：无效性质');check(i.get('review') in {'pending','confirmed','rejected'},label+'：无效审阅状态')
         check(i.get('platform') in run['platforms'],label+'：未知平台')
@@ -52,6 +54,13 @@ def main():
             try:
                 with Image.open(path) as im: im.verify()
             except Exception as ex:errors.append(label+'：图片不可用 '+str(path)+' '+str(ex))
+        if a.final and label in rendered:
+            entry=rendered[label]
+            check(entry.get('context_mode')=='full',label+'：请重新渲染完整上下文主图')
+            for key in ['problem_image','design_image']:
+                actual=Path(i.get(key,''));actual=actual if actual.is_absolute() else a.run/actual
+                expected_image=a.run/entry[key]
+                check(actual.resolve()==expected_image.resolve(),label+'：'+key+' 必须引用完整主图，局部图仅作补充')
         if i.get('publish'):check(i.get('review')=='confirmed',label+'：拟写入项尚未确认')
     if a.final:
         check(bool(cases),'用例为空');check(bool(pm),'Page 为空')
