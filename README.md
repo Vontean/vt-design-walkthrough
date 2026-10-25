@@ -8,7 +8,7 @@
 
 运行在 Codex harness 中，需要 Computer Use 能力、Figma 访问和本地文件读写；写入 Confluence 时还需要 Atlassian 连接器及目标页面权限。
 
-iOS 使用 iPhone Mirroring。Android 优先实机镜像，具体连接与控制路径仍待实机验证。图像脚本使用 Python 3 和 Pillow。
+iOS 使用 iPhone Mirroring。Android 支持 USB + ADB + scrcpy 实机镜像，已验证安装与镜像接入；每轮先校准操作与截图。图像脚本使用 Python 3 和 Pillow。
 
 ## 安装
 
